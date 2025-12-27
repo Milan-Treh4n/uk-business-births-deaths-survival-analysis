@@ -96,3 +96,4 @@ def test_deaths_cleaning_removes_invalid_years():
     # year 0 should be removed
     assert (cleaned["year"] > 0).all()
     assert 2022 in cleaned["year"].values
+# Run as script --- IGNORE ---
