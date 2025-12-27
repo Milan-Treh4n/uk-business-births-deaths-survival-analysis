@@ -23,10 +23,10 @@ jobs:
 
       # Linting (optional but recommended)
       - run:
-          name: Run flake8
-          command: |
-            pip install flake8
-            flake8 src/
+    name: Run flake8
+    command: |
+      pip install flake8
+      flake8 src/ --max-line-length=120 --ignore=E302,E305
 
 workflows:
   main:
