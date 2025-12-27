@@ -1,95 +1,104 @@
 """
-Cleaning pipeline for business survival rates data.
+Cleaning pipeline for Business Survival by Region (2019 cohort).
 
 """
-
 
 from pathlib import Path
 import pandas as pd
 
-# Load
 
-def load_business_survival_rates(path: str | Path) -> pd.DataFrame:
-    """
-    Load raw business survival rates dataset.
-    """
+def load_survival_2019(path: str | Path) -> pd.DataFrame:
+    """Load raw survival table for 2019 cohort."""
     return pd.read_csv(path)
 
-# Clean
 
-def clean_business_survival_rates(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Clean and prepare business survival rates data.
-
-    Steps:
-    - standardise column names
-    - drop completely empty rows
-    - convert numeric-looking columns to numeric
-    - drop rows missing key fields (year / survival-related columns)
-    """
+def clean_survival_2019(df: pd.DataFrame) -> pd.DataFrame:
+    """Clean and structure the 2019 regional survival table."""
     df = df.copy()
 
-    # Standardise column names
-    df.columns = (
-        df.columns
-        .str.strip()
-        .str.lower()
-        .str.replace(" ", "_")
-        .str.replace("-", "_")
-    )
-
-    # Drop completely empty rows
+    # Drop fully empty rows
     df = df.dropna(how="all")
 
-    # Convert likely numeric columns
-    numeric_cols = [
-        col for col in df.columns
-        if any(keyword in col for keyword in ["year", "rate", "percent"])
+    # The first few rows are metadata:
+    # 0: long title
+    # 1: "This worksheet contains one table"
+    # 2: "Units: ..."
+    # 3: "2019"
+    #
+    # Data starts after that, so drop first 4 rows.
+    df = df.iloc[4:, :]
+
+    # Keep first 6 columns (region + 5 numeric columns)
+    df = df.iloc[:, :6]
+
+    # Rename columns to temporary technical names
+    df.columns = [
+        "region",
+        "births_2019",
+        "survive_1yr_count",
+        "survive_1yr_rate",
+        "survive_5yr_count",
+        "survive_5yr_rate",
     ]
+
+    # Drop any remaining non-region rows
+    df = df[df["region"].notna()]
+
+    # Clean numeric formatting for all numeric columns
+    numeric_cols = [
+        "births_2019",
+        "survive_1yr_count",
+        "survive_1yr_rate",
+        "survive_5yr_count",
+        "survive_5yr_rate",
+    ]
+
     for col in numeric_cols:
+        df[col] = (
+            df[col]
+            .astype(str)
+            .str.replace(",", "", regex=False)
+            .str.replace(":", "", regex=False)
+            .str.strip()
+        )
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    # Remove rows missing key values
-    key_cols = [c for c in df.columns if "year" in c or "survival" in c]
-    if key_cols:
-        df = df.dropna(subset=key_cols)
+    # Drop rows with no births (safety)
+    df = df.dropna(subset=["births_2019"]).reset_index(drop=True)
 
-    # Sort chronologically if year exists
-    if "year" in df.columns:
-        df = df.sort_values("year")
+    # Professional, readable titles
+    df = df.rename(
+        columns={
+            "region": "Region",
+            "births_2019": "Births of New Enterprises (2019)",
+            "survive_1yr_count": "Surviving After 1 Year – Count",
+            "survive_1yr_rate": "1-Year Survival Rate (2019 Cohort, %)",
+            "survive_5yr_count": "Surviving After 5 Years – Count",
+            "survive_5yr_rate": "5-Year Survival Rate (2019 Cohort, %)",
+        }
+    )
 
-    return df.reset_index(drop=True)
+    return df
 
 
-# -----------------------------
-# Save
-# -----------------------------
-
-def save_clean_business_survival_rates(
-    df: pd.DataFrame,
-    output_path: str | Path
-) -> None:
-    """
-    Save cleaned survival rates dataset.
-    """
+def save_survival_2019(df: pd.DataFrame, output_path: str | Path) -> None:
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index=False)
 
-# Run as script
 
 if __name__ == "__main__":
-    # Project root = folder above src/
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-    raw_path = PROJECT_ROOT / "data" / "raw" / "business_survival_rates.csv"
-    clean_path = PROJECT_ROOT / "data" / "processed" / "business_survival_rates_clean.csv"
+    raw = PROJECT_ROOT / "data" / "raw" / "business_survival_rates.csv"
+    out = PROJECT_ROOT / "data" / "processed" / "business_survival_rates_2019_clean.csv"
 
     print("PROJECT ROOT:", PROJECT_ROOT)
-    print("RAW PATH:", raw_path)
+    print("RAW PATH:", raw)
 
-    raw_df = load_business_survival_rates(raw_path)
-    clean_df = clean_business_survival_rates(raw_df)
-    save_clean_business_survival_rates(clean_df, clean_path)
+    raw_df = load_survival_2019(raw)
+    clean_df = clean_survival_2019(raw_df)
+    save_survival_2019(clean_df, out)
 
-    print("Saved cleaned data to:", clean_path)
+    print("Saved cleaned data to:", out)
+
