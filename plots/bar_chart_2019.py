@@ -21,12 +21,11 @@ plt.bar(df["Geography Name"], df["Number of Business Births (2019)"])
 plt.xlabel("Region")
 plt.ylabel("Number of Business Births")
 plt.title(f"Top {top_n} Regions – Business Births (2019)")
-plt.xticks(rotation=45)
+plt.xticks(rotation=45, ha="right")
 plt.tight_layout()
 
 plots = PROJECT_ROOT / "plots"
 plots.mkdir(exist_ok=True)
-
 plt.savefig(plots / "business_births_top_regions_2019.png", dpi=300)
 plt.show()
 
