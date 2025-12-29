@@ -22,6 +22,7 @@ plt.barh(
     df["Number of Business Births (2024)"],
 )
 
+# Add data labels
 plt.xlabel("Number of Business Births")
 plt.ylabel("Region")
 plt.title(f"Top {top_n} Regions – Business Births (2024)")
