@@ -14,9 +14,10 @@ df = df.sort_values("Number of Business Deaths (2019)", ascending=False)
 # remove first 4 non-regional entries
 df = df.iloc[4:]
 
-# Create a horizontal bar chart
+# Create a horizontal bar chart with top 15 regions
+df = df.head(15)
 plt.figure(figsize=(10, 8))
-plt.barh(df["Region"], df["Number of Business Deaths (2019)"], color='skyblue')
+plt.barh(df["Geography Name"], df["Number of Business Deaths (2019)"], color='skyblue')
 plt.xlabel("Number of Business Deaths (2019)")
 plt.title("Business Deaths by Region in the UK (2019)")
 plt.gca().invert_yaxis()  # Invert y-axis to have the highest values at the top
