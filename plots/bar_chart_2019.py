@@ -17,11 +17,10 @@ top_n = min(15, len(df))
 df = df.head(top_n)
 
 plt.figure(figsize=(10, 6))
-plt.bar(df["Geography Name"], df["Number of Business Births (2019)"])
-plt.xlabel("Region")
-plt.ylabel("Number of Business Births")
+plt.barh(df["Geography Name"], df["Number of Business Births (2019)"])
+plt.xlabel("Number of Business Births")
+plt.ylabel("Region")
 plt.title(f"Top {top_n} Regions – Business Births (2019)")
-plt.xticks(rotation=45, ha="right")
 plt.tight_layout()
 
 plots = PROJECT_ROOT / "plots"
