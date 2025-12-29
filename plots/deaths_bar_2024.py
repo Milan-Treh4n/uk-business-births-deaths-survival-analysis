@@ -20,10 +20,8 @@ plt.figure(figsize=(10, 8))
 plt.barh(df["Geography Name"], df["Number of Business Deaths (2024)"], color='skyblue')
 plt.xlabel("Number of Business Deaths (2024)")
 plt.title("Business Deaths by Region in the UK (2024)")
-plt.gca().invert_yaxis()  # Invert y-axis to have the highest values at the top
 plt.tight_layout()
 
-# Save the plot
 # Save the plot
 plots = PROJECT_ROOT / "plots"
 plots.mkdir(exist_ok=True)
