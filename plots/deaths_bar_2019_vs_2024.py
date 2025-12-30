@@ -24,8 +24,7 @@ merged = d19[["Geography Name", "Number of Business Deaths (2019)"]].merge(
 )
 
 merged["Total"] = (
-    merged["Number of Business Deaths (2019)"] +
-    merged["Number of Business Deaths (2024)"]
+    merged["Number of Business Deaths (2019)"] + merged["Number of Business Deaths (2024)"]
 )
 merged = merged.sort_values("Total", ascending=False).head(15)
 
